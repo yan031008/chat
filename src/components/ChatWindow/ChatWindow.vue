@@ -3,9 +3,10 @@
         <div class="top">
             {{username}}
         </div>
-        <div class="window">
+        <div class="window" ref="window">
             <!-- <div class="hidden_outer"> -->
 
+            <!-- 上线后得到的积压信息 -->
             <div  v-for="(item,index) in data" :key="index" class="left_flex_window">
                 <div class="padding">
                     <img :src='"http://127.0.0.1:8000/media/"+userimage' alt="">
@@ -16,9 +17,10 @@
                 </div>
             </div>
 
-
+            <!-- 在线时和好友互发信息 -->
             <div v-for="(item,index) in total_message" :key="index">
 
+             <!-- 对方发送的信息 -->
              <div  v-show="item.current_messages" class="left_flex_window">
                 <div class="padding">
                     <img :src='"http://127.0.0.1:8000/media/"+userimage' alt="">
@@ -29,7 +31,7 @@
             </div>
 
 
-
+            <!-- 自己发送的信息 -->
             <div class="right_flex_window" v-show="item.sender">
                 <div class="window_message">
                     {{item.sender}}
@@ -54,8 +56,9 @@
 </template>
 <script setup>
 import { ElMessageBox } from 'element-plus';
-import { onUnmounted,onMounted, ref ,defineProps, watch} from 'vue';
+import { onUnmounted, ref ,defineProps, watch, onUpdated, onBeforeMount} from 'vue';
 import bus from '../../bus/bus.js'
+// import { resolve } from 'core-js/fn/promise';
 // import { turn } from 'core-js/core/array';
 
 
@@ -93,6 +96,12 @@ let message = ref()
 //     return middle
 // })
 
+
+
+
+// 获取的是聊天窗口的滚动条
+let window=ref(null)
+
 let total_message = ref([])
 
 
@@ -103,6 +112,11 @@ let watch_messages=(newvalue) => {
     }
     total_message.value.push({sender:newvalue[newvalue.length-1].message})
 }
+
+onUpdated(()=>{
+    // 监听总的消息变化，一旦有信息来到，滚动条立即到最后一个信息的位置
+    window.value.scrollTop=window.value.scrollHeight-window.value.offsetHeight
+})
 
 watch(messages, watch_messages, {
     // immediate: true,
@@ -134,6 +148,7 @@ watch(userid, (newvalue) => {
         }
     }
 },)
+
 
 
 let send_message = () => {
@@ -180,20 +195,24 @@ let watch_props=(newvalue) => {
 }
 
 let render = ({ item, message })=> {
+    // data.value=[]
+    // total_message.value=[]
     userimage.value = item.fields.userimage
     username.value = item.fields.username
     userid.value = item.pk
+    console.log(userid.value,username.value)
     data.value = message(item.pk)
-    watch(props,watch_props, {
-    immediate: true,
-    deep:true
-})
-    
 }
 
-onMounted(async () => {
+watch(props,watch_props, {
+    // immediate: true,
+    deep:true
+})
+
+onBeforeMount(async () => {
     console.log(props.current_messages)
-    await bus.on("chat_window", render)
+    bus.on("chat_window", render)
+    
 })
 
 onUnmounted(() => {

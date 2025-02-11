@@ -25,7 +25,7 @@
           ></el-input>
      </el-form-item>
      <el-from-item style="width: 200px;display: flex;">
-          <el-button @click="login">登录</el-button>
+          <el-button @click="debound">登录</el-button>
           <el-button @click="sign">注册</el-button>
      </el-from-item>
    </el-form>
@@ -86,6 +86,19 @@ let rules = ref({
 let sign=() => {
   router.push('/sign')
 }
+//定时器
+let time=ref(1)
+
+// 防抖函数
+let debound=()=>{
+  clearTimeout(time.value)
+  time.value=setTimeout(() => {
+    console.log(1)
+    login()
+  }, 1000); 
+}
+
+
 let login =() => {
   const form_data = {}
   // console.log(login_data.value)

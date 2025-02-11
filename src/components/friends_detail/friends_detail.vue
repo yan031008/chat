@@ -12,6 +12,7 @@
             <div style="text-align: left;width: 390px;display: inline-block;overflow: hidden;text-overflow: ellipsis;white-space:nowrap;height: 80px;background-color: aqua;border-radius: 10px;padding: 10px;line-height: 60px;font-size: 20px;">搜索账号:{{ input }}</div>
              </div>
              <FriendsList v-for="(item,index) in users" :key="index" :data="item"></FriendsList>
+             
              <el-collapse v-model="activeNames" @change="handleChange" style="width: 400px;">
                <el-collapse-item title="好友申请" name="1">
                   <FriendsAdd v-for="(item,index) in friends_applys" :key="index" :data="item"></FriendsAdd>
@@ -36,9 +37,13 @@ let is_show = ref()
 
 let users=ref()
 let get_user = () => {
+  // 使axios带有登录凭证也就是cookie
   get_authorization()
+
+
   axios.get(`/get_user/?search_tel_number=${input.value}`,).then((result) => {
     console.log(result)
+    // 如果查询到用户，会返回一个数组，未查询到返回一个对象
     if (result.data instanceof Array) {
       users.value = result.data
       is_show.value = true

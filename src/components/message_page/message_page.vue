@@ -9,7 +9,8 @@
         </div>
       </div>
       <div id="right" class="chat_bg">
-        <ChatWindow v-show="is_show" :socket="socket" :current_messages="current_messages" v-if="is_reload">
+        <ChatWindow v-show="is_show" :socket="socket" :current_messages="current_messages" 
+        >
 
         </ChatWindow>
       </div>
@@ -22,19 +23,22 @@ import {
   onBeforeMount, 
    onMounted, 
   ref,
-  onBeforeUnmount
+  onBeforeUnmount,
+  // watch,
+  // watch
   
 } from 'vue'
 
 import axios from '../../axios/axios.js'
 import get_authorization from '../../cookie/cookie.js'
 import bus from '../../bus/bus.js'
+// import { tr } from 'element-plus/es/locale'
 
 // let index=ref(0)
 
 let chat = (item) => {
-  console.log(typeof message)
-  is_reload.value=true
+  // console.log(typeof message)
+  // is_reload.value=true
   bus.emit('chat_window', { item: item, message: message })
   is_show.value = true
   // is_reload.value=true
@@ -63,7 +67,7 @@ onBeforeMount(async() => {
  
 })
 
-let socket=ref()
+let socket=ref({})
 let messages = ref([])
 let current_messages=ref([])
 let message = (sender_id) => {
@@ -79,6 +83,10 @@ let message = (sender_id) => {
 }
 let cishu = ref(1)
 let message_handle = (e) => {
+  console.log(e.data)
+  if(e.data=='pong'){
+    return
+  }
   // console.log(typeof e.data)
   // // messages.value.push(JSON.parse(e.data).message) 
   if (cishu.value == 1) {
@@ -97,13 +105,13 @@ let message_handle = (e) => {
 
 
 
-let error_handler = (e) => {
-  console.log(e)
-};
+// let error_handler = (e) => {
+//   console.log(e)
+// };
 
 
-onMounted(async () => {
-  let cookies = document.cookie.split(";")
+onMounted(() => {
+    let cookies = document.cookie.split(";")
     let cookie=null;
     for (let i = 0; i < cookies.length; i++) {
         if (cookies[i].indexOf('Authorization=Bearer') != -1) {
@@ -111,8 +119,11 @@ onMounted(async () => {
             break;
         }
     }
-    socket.value = await (socket_create(cookie,message_handle,error_handler)())
-})
+     socket_create(socket,cookie,message_handle)()
+    // watch(socket.value.readyState,(newvalue)=>{
+    //   console.log(newvalue)
+    // })
+  })
 
 onBeforeUnmount(() => {
   console.log("执行销毁")
@@ -121,7 +132,6 @@ onBeforeUnmount(() => {
 
 
 
-let is_reload=ref(false)
 </script>
 <style scoped>
 .middle_father{

@@ -35,7 +35,7 @@
       <el-input  v-model="form.password"/>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="sign_in">注册</el-button>
+      <el-button type="primary" @click="debound">注册</el-button>
       <el-button @click="sign">取消</el-button>
     </el-form-item>
   </el-form>   
@@ -70,6 +70,17 @@ let exceed_handler = (files) => {
   file.uid = genFileId()
   upload.value.handleStart(file)
 }
+
+// 定时器
+let time=ref(null)
+// 防抖函数
+let  debound=()=>{
+  clearTimeout(time.value)
+  time.value=setTimeout(()=>{
+    sign_in()
+  },1000)
+}
+
 let sign_in = () => {
   const formdata = new FormData()
   try {

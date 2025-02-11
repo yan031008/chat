@@ -54,7 +54,7 @@ let add_friend = () => {
       })
             return
         }
-        is_relate.value = true;
+        relate.value = true;
         sender_or_receive.value="sender"
         
     }).catch(() => {
@@ -63,22 +63,22 @@ let add_friend = () => {
       })
     })
 }
-let is_relate = ref()
+// let is_relate = ref()
 let sender_or_receive = ref()
 let relate = computed(() => data.data.is_relate)
 let sender_receive=computed(()=>data.data.sender_or_receive) 
-watch(relate, (newvalue)=> {
-    is_relate.value=newvalue
-}, {
-    immediate:true
-})
+// watch(relate, (newvalue)=> {
+//     is_relate.value=newvalue
+// }, {
+//     immediate:true
+// })
 watch(sender_receive, (newvalue) => {
     sender_or_receive.value=newvalue
 },{
     immediate:true
 })
 let btn_text = computed(() => {
-    if (is_relate.value) {
+    if (!relate.value) {
         if (sender_or_receive.value == "sender")
         {
         return "等待通过"
@@ -86,8 +86,9 @@ let btn_text = computed(() => {
         else if (sender_or_receive.value == 'receiver') {
         return "通过"
         }
+        else return'添加好友'
     }
-        return "添加好友"
+        return "详情"
 })
 </script>
 <style scoped>
